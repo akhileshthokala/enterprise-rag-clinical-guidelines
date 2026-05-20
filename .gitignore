@@ -1,0 +1,34 @@
+# Secrets
+.env
+HANDOFF.md
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+env/
+*.egg-info/
+dist/
+build/
+
+# uv
+.uv/
+
+# Vector store
+chroma_db/
+
+# Logs
+logs/*.jsonl
+logs/*.log
+
+# macOS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+*.swp
