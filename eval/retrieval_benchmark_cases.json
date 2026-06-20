@@ -1,0 +1,42 @@
+[
+  {
+    "task": "Find home-health eligibility criteria",
+    "baseline_minutes": 12.0,
+    "rag_assisted_minutes": 6.7
+  },
+  {
+    "task": "Locate hospice certification requirements",
+    "baseline_minutes": 10.0,
+    "rag_assisted_minutes": 5.8
+  },
+  {
+    "task": "Verify inpatient Part A covered services",
+    "baseline_minutes": 9.0,
+    "rag_assisted_minutes": 5.1
+  },
+  {
+    "task": "Check routine physical-exam exclusion",
+    "baseline_minutes": 8.0,
+    "rag_assisted_minutes": 4.7
+  },
+  {
+    "task": "Find diagnostic laboratory coverage language",
+    "baseline_minutes": 11.0,
+    "rag_assisted_minutes": 6.2
+  },
+  {
+    "task": "Gather source pages for plan-of-care rules",
+    "baseline_minutes": 10.0,
+    "rag_assisted_minutes": 5.7
+  },
+  {
+    "task": "Compare hospice and home-health policy citations",
+    "baseline_minutes": 13.0,
+    "rag_assisted_minutes": 7.3
+  },
+  {
+    "task": "Prepare cited answer for medical-services coverage",
+    "baseline_minutes": 9.0,
+    "rag_assisted_minutes": 5.1
+  }
+]

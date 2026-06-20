@@ -4,6 +4,24 @@ A working RAG (Retrieval-Augmented Generation) system that lets a healthcare pay
 
 The corpus in this demo is the CMS Medicare Benefit Policy Manual (publicly available), but the pipeline is corpus-agnostic — drop any PDFs into `/docs` and re-run ingest.
 
+## Resume Claim Mapping
+
+This repo backs the enterprise AI assistant claim:
+
+- Semantic retrieval over policy PDFs using local embeddings and ChromaDB.
+- Source-grounded responses with file/page citations and refusal-oriented prompting.
+- MCP tools in `src/mcp_server.py` so an MCP-capable LLM host can call retrieval and citation tools.
+- A repeatable portfolio benchmark in `eval/retrieval_benchmark.py` that validates a 40%+ retrieval-speed improvement target against transparent manual-lookup fixtures.
+
+See [docs/mcp-and-benchmark.md](docs/mcp-and-benchmark.md) for the MCP tool surface and benchmark notes.
+
+## What Was Just Added
+
+- Added an MCP stdio server that exposes retrieval and citation lookup as LLM-callable tools.
+- Added a transparent portfolio benchmark for the 40%+ knowledge-retrieval speed target.
+- Added docs that distinguish local portfolio evidence from future production telemetry.
+- Added a native GCP validation plan for a Cloud Run / Cloud Storage / Secret Manager smoke test.
+
 ## Architecture
 
 ```
@@ -42,6 +60,8 @@ The corpus in this demo is the CMS Medicare Benefit Policy Manual (publicly avai
                                                           ▼
                                                    ChromaDB (persisted on disk)
 ```
+
+The same retriever is also exposed through `src/mcp_server.py` as MCP tools for LLM tool-calling demos.
 
 ## Stack
 
@@ -105,6 +125,29 @@ The eval runs 5 representative questions and reports:
 
 Exit code is non-zero on any failure, so this can drop into CI.
 
+## Run the Knowledge-Retrieval Benchmark
+
+```bash
+uv run python -m eval.retrieval_benchmark
+```
+
+The benchmark fixture compares manual policy lookup estimates with a RAG-assisted workflow and passes when the average improvement is at least 40%. It is intentionally transparent portfolio evidence, not production user telemetry.
+
+## Run the MCP Tool Server
+
+```bash
+uv sync --extra mcp
+uv run --extra mcp python -m src.mcp_server
+```
+
+This exposes `search_policy_docs` and `retrieve_citations` over MCP stdio for a host model to call during answer generation.
+
+## Next Step: Native GCP Validation
+
+The next milestone is to deploy the API path to a sandbox GCP project with Cloud Run and Secret Manager while keeping the document set public-safe.
+
+See [docs/native-gcp-validation.md](docs/native-gcp-validation.md) for the validation plan.
+
 ## Design decisions worth calling out
 
 1. **Local embeddings, not Voyage/OpenAI.** Keeps the demo self-contained and zero-cost beyond Anthropic. Swap `EMBEDDING_MODEL` in `.env` for a different sentence-transformers model, or replace `SentenceTransformerEmbeddingFunction` in `src/ingest.py` for a hosted embedding API.
@@ -127,9 +170,12 @@ enterprise-rag-pipeline/
 │   ├── config.py        # Env-driven config
 │   ├── ingest.py        # PDF → chunks → embeddings → Chroma
 │   ├── retriever.py     # Chroma query wrapper
+│   ├── mcp_server.py    # MCP tools for retrieval + citation lookup
 │   └── api.py           # FastAPI app
 ├── eval/
 │   ├── questions.py     # 5 question/expected-source pairs
+│   ├── retrieval_benchmark.py       # 40%+ knowledge retrieval benchmark
+│   ├── retrieval_benchmark_cases.json
 │   └── run_eval.py      # Eval runner with pass/fail summary
 ├── logs/                # (gitignored) runtime logs
 ├── chroma_db/           # (gitignored) persisted vector store
@@ -140,6 +186,7 @@ enterprise-rag-pipeline/
 
 ## Future work
 
+- Native GCP smoke test on Cloud Run with Secret Manager.
 - LLM-as-judge evals for response quality (current eval only checks keyword presence).
 - Streaming responses from the API for better UX on long answers.
 - Reranking step (e.g. cross-encoder) between retrieval and generation.
